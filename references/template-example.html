@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}} — 旅行攻略</title>
+<style>
+/* ========== Reset & Base ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  background: #FDF8F0;
+  color: #3D3225;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 800px; margin: 0 auto; padding: 0 16px; }
+
+/* ========== Hero ========== */
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, #4A7C59 0%, #2D5A3D 30%, #5C8A4D 60%, #8FAF7B 100%);
+  color: #fff;
+  padding: 60px 32px 40px;
+  border-radius: 0 0 24px 24px;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.hero h1 { font-size: 28px; font-weight: 800; line-height: 1.3; margin-bottom: 8px; }
+.hero .subtitle { font-size: 14px; opacity: 0.85; margin-bottom: 28px; line-height: 1.6; }
+.hero-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.hero-stat .value { font-size: 18px; font-weight: 700; }
+.hero-stat .label { font-size: 12px; opacity: 0.75; }
+
+/* ========== Section ========== */
+.section { margin: 28px auto; max-width: 800px; padding: 0 16px; }
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3D3225;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  border-left: 4px solid #D4A84B;
+}
+
+/* ========== Route Overview ========== */
+.route-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.route-node {
+  background: #D4A84B;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.route-arrow {
+  color: #D4A84B;
+  font-size: 18px;
+  margin: 0 4px;
+}
+.route-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.route-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-top: 3px solid #D4A84B;
+}
+.route-card h4 { font-size: 15px; color: #8B6914; margin-bottom: 6px; }
+.route-card p { font-size: 13px; color: #6B5E50; line-height: 1.6; }
+
+/* ========== Day Card ========== */
+.day-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.day-header {
+  background: linear-gradient(135deg, #F5E6D0 0%, #F0DCC0 100%);
+  border-left: 5px solid #D4A84B;
+  padding: 18px 24px;
+}
+.day-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6B4E1B;
+}
+.day-body {
+  display: flex;
+  padding: 24px;
+  gap: 24px;
+}
+.day-timeline { flex: 1; min-width: 0; }
+.day-sidebar { width: 200px; flex-shrink: 0; }
+
+/* Timeline Items */
+.tl-item {
+  position: relative;
+  padding-left: 28px;
+  padding-bottom: 24px;
+  border-left: 2px solid #E8D5B5;
+  margin-left: 5px;
+}
+.tl-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: 4px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #D4A84B;
+  border: 2px solid #FDF8F0;
+}
+.tl-time {
+  font-size: 13px;
+  color: #8B6914;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.tl-spot-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3D3225;
+  margin-bottom: 4px;
+}
+.tl-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-recommend { background: #E8F5E9; color: #2E7D32; }
+.tag-free { background: #E3F2FD; color: #1565C0; }
+.tag-booking { background: #FFF3E0; color: #E65100; }
+.tag-photo { background: #FCE4EC; color: #C62828; }
+.tag-ticket { background: #F3E5F5; color: #6A1B9A; }
+.tl-desc { font-size: 13px; color: #6B5E50; line-height: 1.6; }
+
+/* Sidebar */
+.sidebar-box {
+  background: #FFFAF3;
+  border-left: 3px solid #D4A84B;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.sidebar-box h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #8B6914;
+  margin-bottom: 10px;
+}
+.sidebar-box li {
+  font-size: 13px;
+  color: #5C5043;
+  margin-bottom: 6px;
+  list-style: disc;
+  margin-left: 16px;
+  line-height: 1.5;
+}
+
+/* ========== Info Grid (3-col) ========== */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.info-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #8B6914;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #F5E6D0;
+}
+.info-card p, .info-card li {
+  font-size: 13px;
+  color: #5C5043;
+  line-height: 1.7;
+}
+.info-card ul { padding-left: 16px; }
+.info-card li { margin-bottom: 4px; list-style: disc; }
+
+/* Ticket Table */
+.ticket-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ticket-table th {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 2px solid #F5E6D0;
+  color: #8B6914;
+  font-weight: 600;
+}
+.ticket-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #F0E8DC;
+  color: #5C5043;
+}
+
+/* ========== Budget Section ========== */
+.budget-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.budget-header {
+  background: linear-gradient(135deg, #D4A84B 0%, #B8941F 100%);
+  padding: 18px 24px;
+  color: #fff;
+}
+.budget-header h3 { font-size: 18px; font-weight: 700; }
+.budget-header .budget-meta { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+.budget-body { padding: 24px; }
+.budget-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px; }
+.budget-table thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #FDF8F0;
+  color: #8B6914;
+  font-weight: 700;
+  border-bottom: 2px solid #E8D5B5;
+  font-size: 13px;
+}
+.budget-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #F0E8DC;
+  color: #3D3225;
+}
+.budget-table tbody td:last-child { color: #6B5E50; font-size: 12px; }
+.budget-table tbody tr:hover { background: #FFFAF3; }
+.budget-total-row td {
+  font-weight: 700 !important;
+  border-top: 2px solid #D4A84B !important;
+  border-bottom: none !important;
+  padding-top: 14px !important;
+}
+.budget-totals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.budget-level {
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.budget-level .level-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.budget-level .level-price { font-size: 22px; font-weight: 800; }
+.budget-level .level-note { font-size: 11px; margin-top: 4px; opacity: 0.8; }
+.budget-economy { background: #E8F5E9; color: #2E7D32; }
+.budget-comfort { background: #FFF3E0; color: #E65100; }
+.budget-luxury { background: #F3E5F5; color: #6A1B9A; }
+.saving-tips {
+  background: #FFFAF3;
+  border-left: 3px solid #D4A84B;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.saving-tips h4 { font-size: 14px; font-weight: 700; color: #8B6914; margin-bottom: 10px; }
+.saving-tips li { font-size: 13px; color: #5C5043; margin-bottom: 6px; list-style: disc; margin-left: 16px; line-height: 1.5; }
+.budget-disclaimer {
+  font-size: 12px;
+  color: #A09585;
+  text-align: center;
+  padding: 12px;
+  background: #FDF8F0;
+  border-radius: 8px;
+}
+
+/* ========== Checklist (2-col) ========== */
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.check-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.check-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #8B6914;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #F5E6D0;
+}
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #5C5043;
+  line-height: 1.6;
+}
+.check-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #D4A84B;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+/* ========== Footer ========== */
+.footer {
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 12px;
+  color: #A09585;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 640px) {
+  .hero { padding: 40px 20px 28px; }
+  .hero h1 { font-size: 22px; }
+  .hero-stats { gap: 16px; }
+  .hero-stat .value { font-size: 15px; }
+  .day-body { flex-direction: column; }
+  .day-sidebar { width: 100%; }
+  .info-grid { grid-template-columns: 1fr; }
+  .check-grid { grid-template-columns: 1fr; }
+  .route-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ========== Print ========== */
+@media print {
+  body { background: #fff; }
+  .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .day-card { break-inside: avoid; box-shadow: none; border: 1px solid #E0D5C5; }
+  .info-card, .check-card { box-shadow: none; border: 1px solid #E0D5C5; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-content">
+    <span class="hero-badge">{{YEAR}} {{HOLIDAY}} · {{TRAVEL_MODE}} · {{DAYS}}天{{NIGHTS}}晚</span>
+    <h1>{{ROUTE_TITLE}}</h1>
+    <p class="subtitle">{{ROUTE_SUBTITLE}}</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="value">{{DATE_RANGE}}</span>
+        <span class="label">出行日期</span>
+      </div>
+      <div class="hero-stat">
+        <span class="value">{{TOTAL_KM}}</span>
+        <span class="label">总里程</span>
+      </div>
+      <div class="hero-stat">
+        <span class="value">{{THEME_COUNT}} 段主题</span>
+        <span class="label">路线分段</span>
+      </div>
+      <div class="hero-stat">
+        <span class="value">{{KEY_HIGHLIGHT}}</span>
+        <span class="label">重点提醒</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ROUTE OVERVIEW ==================== -->
+<div class="section">
+  <h2 class="section-title">路线总览</h2>
+
+  <div class="route-flow">
+    <!-- Repeat for each segment -->
+    <span class="route-node">{{SEGMENT_1}}</span>
+    <span class="route-arrow">&rarr;</span>
+    <span class="route-node">{{SEGMENT_2}}</span>
+    <span class="route-arrow">&rarr;</span>
+    <span class="route-node">{{SEGMENT_3}}</span>
+    <span class="route-arrow">&rarr;</span>
+    <span class="route-node">{{SEGMENT_4}}</span>
+  </div>
+
+  <div class="route-cards">
+    <!-- Repeat for each segment -->
+    <div class="route-card">
+      <h4>{{SEGMENT_NAME}}</h4>
+      <p>{{SEGMENT_FEATURES}}</p>
+    </div>
+    <!-- ... more route cards -->
+  </div>
+</div>
+
+<!-- ==================== DAY CARDS ==================== -->
+<!-- Repeat for each day -->
+<div class="section">
+  <div class="day-card">
+    <div class="day-header">
+      <h3>Day {{N}} &middot; {{MONTH}}月{{DATE}}日 &middot; 主题：{{DAY_THEME}}</h3>
+    </div>
+    <div class="day-body">
+      <div class="day-timeline">
+
+        <!-- Timeline Item -->
+        <div class="tl-item">
+          <div class="tl-time">{{START_TIME}} - {{END_TIME}}</div>
+          <div class="tl-spot-name">{{SPOT_NAME}}</div>
+          <div class="tl-tags">
+            <span class="tag tag-ticket">{{TICKET_PRICE}}</span>
+            <span class="tag tag-recommend">推荐</span>
+          </div>
+          <div class="tl-desc">{{SPOT_DESCRIPTION}}</div>
+        </div>
+
+        <!-- More timeline items... -->
+
+      </div>
+      <div class="day-sidebar">
+        <div class="sidebar-box">
+          <h4>今日亮点</h4>
+          <ul>
+            <li>{{HIGHLIGHT_1}}</li>
+            <li>{{HIGHLIGHT_2}}</li>
+            <li>{{HIGHLIGHT_3}}</li>
+          </ul>
+        </div>
+        <div class="sidebar-box">
+          <h4>重要提醒</h4>
+          <ul>
+            <li>{{TIP_1}}</li>
+            <li>{{TIP_2}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BOOKING & PREP ==================== -->
+<div class="section">
+  <h2 class="section-title">预约与行前准备</h2>
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>预约购票</h4>
+      <table class="ticket-table">
+        <thead>
+          <tr><th>景点</th><th>预约</th><th>参考价</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>{{SPOT}}</td><td>{{BOOKING_STATUS}}</td><td>{{PRICE}}</td></tr>
+          <!-- More rows... -->
+        </tbody>
+      </table>
+    </div>
+    <div class="info-card">
+      <h4>交通前往</h4>
+      <ul>
+        <li>{{TRANSPORT_OPTION_1}}</li>
+        <li>{{TRANSPORT_OPTION_2}}</li>
+        <li>{{TRANSPORT_OPTION_3}}</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h4>预约入口 &amp; 提醒</h4>
+      <ul>
+        <li>{{REMINDER_1}}</li>
+        <li>{{REMINDER_2}}</li>
+        <li>{{REMINDER_3}}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PRACTICAL TIPS ==================== -->
+<div class="section">
+  <h2 class="section-title">实用建议</h2>
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>住宿推荐</h4>
+      <ul>
+        <li>{{ACCOMMODATION_1}}</li>
+        <li>{{ACCOMMODATION_2}}</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h4>美食推荐</h4>
+      <ul>
+        <li>{{FOOD_1}}</li>
+        <li>{{FOOD_2}}</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h4>餐饮安排</h4>
+      <ul>
+        <li>{{DINING_1}}</li>
+        <li>{{DINING_2}}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BUDGET ESTIMATE ==================== -->
+<div class="section">
+  <h2 class="section-title">预算预估</h2>
+  <div class="budget-card">
+    <div class="budget-header">
+      <h3>{{PEOPLE_COUNT}}人 · {{DAYS}}天{{NIGHTS}}晚 · 费用预估</h3>
+      <div class="budget-meta">基于 {{DATA_SOURCE}} 数据（{{PRICE_DATE}} 参考价）</div>
+    </div>
+    <div class="budget-body">
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th>费用项目</th>
+            <th>单价参考</th>
+            <th>小计（{{PEOPLE_COUNT}}人）</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>往返机票</td>
+            <td>{{FLIGHT_UNIT}}</td>
+            <td>{{FLIGHT_SUBTOTAL}}</td>
+            <td>{{FLIGHT_NOTE}}</td>
+          </tr>
+          <tr>
+            <td>酒店住宿</td>
+            <td>{{HOTEL_UNIT}}</td>
+            <td>{{HOTEL_SUBTOTAL}}</td>
+            <td>{{HOTEL_NOTE}}</td>
+          </tr>
+          <tr>
+            <td>景点/活动</td>
+            <td>{{ACTIVITY_UNIT}}</td>
+            <td>{{ACTIVITY_SUBTOTAL}}</td>
+            <td>{{ACTIVITY_NOTE}}</td>
+          </tr>
+          <tr>
+            <td>餐饮</td>
+            <td>{{FOOD_UNIT}}</td>
+            <td>{{FOOD_SUBTOTAL}}</td>
+            <td>{{FOOD_NOTE}}</td>
+          </tr>
+          <tr>
+            <td>当地交通</td>
+            <td>{{TRANSPORT_UNIT}}</td>
+            <td>{{TRANSPORT_SUBTOTAL}}</td>
+            <td>{{TRANSPORT_NOTE}}</td>
+          </tr>
+          <tr>
+            <td>签证/保险</td>
+            <td>{{VISA_UNIT}}</td>
+            <td>{{VISA_SUBTOTAL}}</td>
+            <td>{{VISA_NOTE}}</td>
+          </tr>
+          <tr>
+            <td>其他</td>
+            <td>{{OTHER_UNIT}}</td>
+            <td>{{OTHER_SUBTOTAL}}</td>
+            <td>{{OTHER_NOTE}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="budget-totals">
+        <div class="budget-level budget-economy">
+          <div class="level-name">经济型</div>
+          <div class="level-price">{{TOTAL_ECONOMY}}</div>
+          <div class="level-note">{{ECONOMY_DESC}}</div>
+        </div>
+        <div class="budget-level budget-comfort">
+          <div class="level-name">舒适型</div>
+          <div class="level-price">{{TOTAL_COMFORT}}</div>
+          <div class="level-note">{{COMFORT_DESC}}</div>
+        </div>
+        <div class="budget-level budget-luxury">
+          <div class="level-name">豪华型</div>
+          <div class="level-price">{{TOTAL_LUXURY}}</div>
+          <div class="level-note">{{LUXURY_DESC}}</div>
+        </div>
+      </div>
+
+      <div class="saving-tips">
+        <h4>省钱小贴士</h4>
+        <ul>
+          <li>{{SAVING_TIP_1}}</li>
+          <li>{{SAVING_TIP_2}}</li>
+          <li>{{SAVING_TIP_3}}</li>
+        </ul>
+      </div>
+
+      <div class="budget-disclaimer">{{BUDGET_DISCLAIMER}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FINAL CHECKLIST ==================== -->
+<div class="section">
+  <h2 class="section-title">出发前最后检查</h2>
+  <div class="check-grid">
+    <div class="check-card">
+      <h4>注意事项</h4>
+      <div class="check-item"><span class="check-dot"></span><span>{{NOTICE_1}}</span></div>
+      <div class="check-item"><span class="check-dot"></span><span>{{NOTICE_2}}</span></div>
+      <div class="check-item"><span class="check-dot"></span><span>{{NOTICE_3}}</span></div>
+    </div>
+    <div class="check-card">
+      <h4>携带清单</h4>
+      <div class="check-item"><span class="check-dot"></span><span>{{PACK_1}}</span></div>
+      <div class="check-item"><span class="check-dot"></span><span>{{PACK_2}}</span></div>
+      <div class="check-item"><span class="check-dot"></span><span>{{PACK_3}}</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+  <p>由 WorkBuddy Travel Planner 自动生成 &middot; {{GENERATE_DATE}}</p>
+  <p>数据来源于公开信息，出行前请核实最新价格和政策</p>
+</div>
+
+</body>
+</html>
