@@ -40,10 +40,10 @@ Phase 4: HTML 攻略页面生成 + 预览
 
 ```bash
 # WorkBuddy
-git clone https://github.com/<your-username>/travel-planner-skill.git ~/.workbuddy/skills/travel-planner
+git clone https://github.com/ycyliu/travel-planner-skill.git ~/.workbuddy/skills/travel-planner
 
 # 或 CodeBuddy
-git clone https://github.com/<your-username>/travel-planner-skill.git ~/.codebuddy/skills/travel-planner
+git clone https://github.com/ycyliu/travel-planner-skill.git ~/.codebuddy/skills/travel-planner
 ```
 
 ### 触发词
